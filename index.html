@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>HealthDash V7</title>
+<title>HealthDash</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -292,6 +292,42 @@ main{min-width:0;padding-bottom:40px}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 #toast svg{width:18px;height:18px;color:var(--blue-2)}
 
+/* Bioimpedância */
+.bio-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px 32px}
+.bi-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.bi-name{font-size:13px;color:var(--muted)}
+.bi-status{font-size:12px;font-weight:600}
+.bi-val{font-size:26px;font-weight:600;letter-spacing:-.02em;margin:6px 0 12px}
+.bi-val small{font-size:14px;font-weight:500;color:var(--muted);margin-left:3px}
+.range{position:relative;height:6px}
+.range-bar{display:flex;gap:3px;height:100%}
+.range-bar span{flex:1;border-radius:4px;opacity:.55}
+.marker{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;transform:translate(-50%,-50%);
+  background:#0b1120;border:3px solid #fff;box-shadow:0 0 10px rgba(255,255,255,.55)}
+.ticks{position:relative;height:16px;margin-top:6px;font-size:11px;color:var(--dim)}
+.ticks span{position:absolute;transform:translateX(-50%)}
+.bi-delta{font-size:11.5px;color:var(--dim);margin-top:2px;min-height:14px}
+
+/* Pontuação */
+.score{display:flex;align-items:center;gap:22px}
+.score .ring-box{width:136px;height:136px}
+.score .ring-center b{font-size:32px}
+.score-rows{flex:1;display:flex;flex-direction:column;gap:14px}
+.score-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.score-row:last-child{border-bottom:0;padding-bottom:0}
+.score-row span{font-size:13px;color:var(--muted)}
+.score-row b{font-size:17px;font-weight:600}
+
+.tiles.wide{grid-template-columns:repeat(6,1fr)}
+.chart-empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font-size:13px;color:var(--muted);padding:20px;pointer-events:none}
+@media (max-width:980px){.bio-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){
+  .bio-list{grid-template-columns:1fr;gap:22px}
+  .tiles.wide{grid-template-columns:repeat(3,1fr)}
+  .score{flex-direction:column;align-items:stretch}
+  .score .ring-box{margin:0 auto}
+}
+
 /* ---------- Mobile ---------- */
 .mnav{display:none}
 @media (max-width:980px){
@@ -379,9 +415,7 @@ main{min-width:0;padding-bottom:40px}
         <p class="date-week" id="dateWeek"></p>
         <div class="weigh">
           <svg class="weigh-icon" viewBox="0 0 64 64" fill="none" aria-hidden="true">
-            <defs>
-              <linearGradient id="wg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#93c5fd"/><stop offset="1" stop-color="#3b82f6"/></linearGradient>
-            </defs>
+            <defs><linearGradient id="wg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#93c5fd"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs>
             <rect x="8" y="12" width="48" height="44" rx="12" stroke="url(#wg)" stroke-width="3"/>
             <path d="M20 30a12 12 0 0124 0" stroke="#f59e4b" stroke-width="3" stroke-linecap="round" style="filter:drop-shadow(0 0 4px #f59e4b)"/>
             <path d="M32 30l5-6" stroke="#f59e4b" stroke-width="3" stroke-linecap="round"/>
@@ -405,7 +439,8 @@ main{min-width:0;padding-bottom:40px}
             <div class="pct"><span id="fatNow">--</span><small>%</small></div>
             <p class="pct-note" id="fatNote">Gordura corporal</p>
             <div class="stats">
-              <div class="stat"><span>Peso perdido</span><b id="statLost">--</b></div>
+              <div class="stat"><span>Músculo</span><b id="statMuscle">--</b></div>
+              <div class="stat"><span>Massa óssea</span><b id="statBone">--</b></div>
               <div class="stat"><span>Registros</span><b id="statCount">--</b></div>
             </div>
           </div>
@@ -414,13 +449,23 @@ main{min-width:0;padding-bottom:40px}
       </section>
 
       <section class="card s5">
-        <div class="card-head" style="margin-bottom:10px"><h2 class="card-title">Mounjaro</h2></div>
-        <div class="dose">
-          <div class="ring-box" id="doseRing"></div>
-          <button class="btn-glow" onclick="openModal(todayISO(),'tabMounjaro')">
-            <svg viewBox="0 0 12 12" fill="currentColor"><path d="M2 1l9 5-9 5z"/></svg>Registrar dose
-          </button>
+        <div class="card-head"><h2 class="card-title">Pontuação corporal</h2></div>
+        <div class="score">
+          <div class="ring-box" id="scoreRing"></div>
+          <div class="score-rows">
+            <div class="score-row"><span>Idade corporal</span><b id="bodyAge">--</b></div>
+            <div class="score-row"><span>Peso ideal</span><b id="idealWeight">--</b></div>
+            <div class="score-row"><span>Até o ideal</span><b id="toIdeal">--</b></div>
+          </div>
         </div>
+      </section>
+
+      <section class="card s12">
+        <div class="card-head">
+          <h2 class="card-title">Bioimpedância</h2>
+          <span class="chip" id="bioDate">--</span>
+        </div>
+        <div class="bio-list" id="bioList"></div>
       </section>
 
       <section class="card s7">
@@ -434,10 +479,13 @@ main{min-width:0;padding-bottom:40px}
       </section>
 
       <section class="card s5">
-        <h2 class="card-title">Tendência</h2>
-        <p class="trend-status" style="margin-top:6px" id="trendStatus">--</p>
-        <div class="wave-wrap" id="trendWave"></div>
-        <div class="trend-foot"><span>Ritmo semanal</span><b id="trendRate">--</b></div>
+        <div class="card-head" style="margin-bottom:10px"><h2 class="card-title">Mounjaro</h2></div>
+        <div class="dose">
+          <div class="ring-box" id="doseRing"></div>
+          <button class="btn-glow" onclick="openModal(todayISO(),'tabMounjaro')">
+            <svg viewBox="0 0 12 12" fill="currentColor"><path d="M2 1l9 5-9 5z"/></svg>Registrar dose
+          </button>
+        </div>
       </section>
 
       <section class="card s7">
@@ -446,21 +494,17 @@ main{min-width:0;padding-bottom:40px}
           <div class="seg" role="group" aria-label="Métrica">
             <button class="on" data-mode="peso" onclick="setBarMode('peso')">Peso</button>
             <button data-mode="gordura" onclick="setBarMode('gordura')">Gordura</button>
+            <button data-mode="musculo" onclick="setBarMode('musculo')">Músculo</button>
           </div>
         </div>
         <div id="barsArea"></div>
       </section>
 
       <section class="card s5">
-        <div class="card-head"><h2 class="card-title">Registro rápido</h2></div>
-        <div class="tiles">
-          <button class="tile" onclick="openModal(todayISO(),'tabBalanca')"><span class="tile-ic"><svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="4"/><path d="M8 11a4 4 0 018 0M12 11l2-2.5"/></svg></span>Peso</button>
-          <button class="tile" onclick="openModal(todayISO(),'tabMedidas')"><span class="tile-ic"><svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="8" rx="2"/><path d="M6 8v3M10 8v4M14 8v3M18 8v4"/></svg></span>Medidas</button>
-          <button class="tile" onclick="openModal(todayISO(),'tabMounjaro')"><span class="tile-ic"><svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 2l4 4M15 5l4 4M17 7l-9 9M11 7l6 6M8 16l-3 3M5 16l3 3"/></svg></span>Mounjaro</button>
-          <button class="tile" onclick="openModal(todayISO(),'tabExames')"><span class="tile-ic"><svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" viewBox="0 0 24 24"><path d="M12 3s6 7 6 11a6 6 0 01-12 0c0-4 6-11 6-11z"/></svg></span>Exames</button>
-          <button class="tile" onclick="document.getElementById('csvFileInput').click()"><span class="tile-ic"><svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg></span>Importar</button>
-          <button class="tile" onclick="exportCSV()"><span class="tile-ic"><svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"/></svg></span>Exportar</button>
-        </div>
+        <h2 class="card-title">Tendência</h2>
+        <p class="trend-status" style="margin-top:6px" id="trendStatus">--</p>
+        <div class="wave-wrap" id="trendWave"></div>
+        <div class="trend-foot"><span>Ritmo semanal</span><b id="trendRate">--</b></div>
       </section>
 
       <section class="card s7">
@@ -478,7 +522,19 @@ main{min-width:0;padding-bottom:40px}
         </div>
         <div class="exam-ring"><div class="ring-box" id="examRing"></div></div>
         <div class="meters" id="examMeters"></div>
-        <p class="meters-note">Variação desde o primeiro exame</p>
+        <p class="meters-note" id="examNote">Variação desde o primeiro exame</p>
+      </section>
+
+      <section class="card s12">
+        <div class="card-head"><h2 class="card-title">Registro rápido</h2></div>
+        <div class="tiles wide">
+          <button class="tile" onclick="openModal(todayISO(),'tabBalanca')"><span class="tile-ic"><svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="4"/><path d="M8 11a4 4 0 018 0M12 11l2-2.5"/></svg></span>Balança</button>
+          <button class="tile" onclick="openModal(todayISO(),'tabMedidas')"><span class="tile-ic"><svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="8" rx="2"/><path d="M6 8v3M10 8v4M14 8v3M18 8v4"/></svg></span>Medidas</button>
+          <button class="tile" onclick="openModal(todayISO(),'tabMounjaro')"><span class="tile-ic"><svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 2l4 4M15 5l4 4M17 7l-9 9M11 7l6 6M8 16l-3 3M5 16l3 3"/></svg></span>Mounjaro</button>
+          <button class="tile" onclick="openModal(todayISO(),'tabExames')"><span class="tile-ic"><svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" viewBox="0 0 24 24"><path d="M12 3s6 7 6 11a6 6 0 01-12 0c0-4 6-11 6-11z"/></svg></span>Exames</button>
+          <button class="tile" onclick="document.getElementById('csvFileInput').click()"><span class="tile-ic"><svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg></span>Importar</button>
+          <button class="tile" onclick="exportCSV()"><span class="tile-ic"><svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"/></svg></span>Exportar</button>
+        </div>
       </section>
 
       <section class="card s12">
@@ -489,7 +545,7 @@ main{min-width:0;padding-bottom:40px}
         <div class="measure-grid">
           <div>
             <div class="anatomy-container" id="anatomyContainer">
-              <img src="Gemini_Generated_Image_bprz8vbprz8vbprz.jpg" alt="Mapa anatômico" class="anatomy-img" onerror="this.src='https://placehold.co/400x600/0f172a/64748b?text=Anatomia'">
+              <img src="Gemini_Generated_Image_bprz8vbprz8vbprz.jpg" alt="Mapa anatômico" class="anatomy-img" onerror="this.onerror=null;this.src='https://placehold.co/400x600/0f172a/64748b?text=Anatomia'">
               <div class="muscle-overlay" data-metric="Peitoral (cm)" style="top:22%;left:33%;width:34%;height:11%;border-radius:40% 40% 50% 50%"></div>
               <div class="muscle-overlay" data-metric="Abdômen (cm)" style="top:36%;left:39%;width:22%;height:16%"></div>
               <div class="muscle-overlay" data-metric="Cintura (cm)" style="top:34%;left:38%;width:24%;height:6%;opacity:0;pointer-events:none"></div>
@@ -499,7 +555,10 @@ main{min-width:0;padding-bottom:40px}
               <div class="muscle-overlay" data-metric="Coxa Esq (cm)" style="top:55%;left:55%;width:18%;height:33%"></div>
             </div>
           </div>
-          <div class="chart-box" id="measureChartContainer"><canvas id="measureChart"></canvas></div>
+          <div class="chart-box" id="measureChartContainer">
+            <canvas id="measureChart"></canvas>
+            <div class="chart-empty hidden" id="measureEmpty">Nenhuma medida registrada ainda.<br>Use Registro rápido e depois Medidas.</div>
+          </div>
         </div>
       </section>
     </div>
@@ -557,11 +616,18 @@ main{min-width:0;padding-bottom:40px}
       <form id="entryForm" onsubmit="return false">
         <input type="hidden" id="entryDate">
         <div id="tabBalanca" class="tab-content">
-          <div class="fgrid">
+          <div class="fgrid three">
             <div class="field"><label for="inpPeso">Peso (kg)</label><input type="number" step="0.1" id="inpPeso"></div>
-            <div class="field"><label for="inpGordura">Gordura (%)</label><input type="number" step="0.1" id="inpGordura"></div>
-            <div class="field"><label for="inpMassaMagra">Massa magra (kg)</label><input type="number" step="0.1" id="inpMassaMagra"></div>
-            <div class="field"><label for="inpVisceral">Visceral (índice)</label><input type="number" step="1" id="inpVisceral"></div>
+            <div class="field"><label for="inpGordura">Gordura corporal (%)</label><input type="number" step="0.1" id="inpGordura"></div>
+            <div class="field"><label for="inpMusculo">Músculo (kg)</label><input type="number" step="0.01" id="inpMusculo"></div>
+            <div class="field"><label for="inpVisceral">Gordura visceral</label><input type="number" step="1" id="inpVisceral"></div>
+            <div class="field"><label for="inpAgua">Água (%)</label><input type="number" step="0.1" id="inpAgua"></div>
+            <div class="field"><label for="inpProteina">Proteína (%)</label><input type="number" step="0.1" id="inpProteina"></div>
+            <div class="field"><label for="inpMassaOssea">Massa óssea (kg)</label><input type="number" step="0.01" id="inpMassaOssea"></div>
+            <div class="field"><label for="inpTmb">Metabolismo basal (kcal)</label><input type="number" step="1" id="inpTmb"></div>
+            <div class="field"><label for="inpImc">IMC</label><input type="number" step="0.1" id="inpImc"></div>
+            <div class="field"><label for="inpIdadeCorporal">Idade corporal</label><input type="number" step="1" id="inpIdadeCorporal"></div>
+            <div class="field"><label for="inpPontuacao">Pontuação corporal</label><input type="number" step="1" id="inpPontuacao"></div>
           </div>
         </div>
         <div id="tabMedidas" class="tab-content">
@@ -614,19 +680,36 @@ main{min-width:0;padding-bottom:40px}
 <script>
 /* ===== Config ===== */
 const USER_NAME = 'Diego';
-const STORAGE_KEY = 'healthDashDataV6'; // mesma chave da V6: os dados existentes continuam
+const STORAGE_KEY = 'healthDashDataV8'; // chave nova: descarta os dados de exemplo antigos
+const PESO_IDEAL = 66.5;                // referência da balança (Zepp Life)
+const TMB_ALVO = 2373;                  // metabolismo basal de referência (Zepp Life)
 
 const monthNames = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 const monthsShort = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
-const fields = ['Peso','Gordura','MassaMagra','Visceral','Abdomen','Cintura','Peitoral','BracoDir','BracoEsq','CoxaDir','CoxaEsq','Mounjaro','Treino','Calorias','Passos','Sono','Glicemia','Insulina','Testosterona','Hdl','Ldl','Triglicerideos','VitaminaD'];
+const fields = [
+  'Peso','Gordura','Musculo','Visceral','Agua','Proteina','MassaOssea','Tmb','Imc','IdadeCorporal','Pontuacao',
+  'Abdomen','Cintura','Peitoral','BracoDir','BracoEsq','CoxaDir','CoxaEsq',
+  'Mounjaro','Treino','Calorias','Passos','Sono',
+  'Glicemia','Insulina','Testosterona','Hdl','Ldl','Triglicerideos','VitaminaD'
+];
+const SCALE_KEYS = ['peso','gordura','musculo','visceral','agua','proteina','massaossea','tmb','imc','idadecorporal','pontuacao'];
+const MEASURE_KEYS = ['abdomen','cintura','peitoral','bracodir','bracoesq','coxadir','coxaesq'];
+const EXAM_KEYS = ['glicemia','insulina','hdl','ldl','triglicerideos','testosterona','vitaminad'];
 
-const mockData = {
-  "2026-07-22": { peso: 98, gordura: 26.5, abdomen: 105, cintura: 100, peitoral: 108, bracodir: 39, bracoesq: 38.5, coxadir: 64, coxaesq: 63.5, glicemia: 105, insulina: 14.5, hdl: 40, ldl: 135, triglicerideos: 170, testosterona: 410, vitaminad: 28, mounjaro: 2.5 },
-  "2026-08-05": { peso: 96.5, gordura: 25.5, abdomen: 103, cintura: 98, peitoral: 107, bracodir: 38.8, bracoesq: 38.2, coxadir: 63.5, coxaesq: 63 },
-  "2026-08-22": { peso: 95, gordura: 24.8, abdomen: 101, cintura: 96, peitoral: 106, bracodir: 38.5, bracoesq: 38, coxadir: 63, coxaesq: 62.5, glicemia: 98, insulina: 11.2, hdl: 44, ldl: 125, triglicerideos: 140, testosterona: 460, vitaminad: 32, mounjaro: 5 },
-  "2026-09-05": { peso: 93.8, gordura: 24.0, abdomen: 99.5, cintura: 94, peitoral: 105, bracodir: 38.2, bracoesq: 37.8, coxadir: 62.5, coxaesq: 62 },
-  "2026-09-22": { peso: 92.5, gordura: 23.2, abdomen: 98, cintura: 92, peitoral: 104, bracodir: 38, bracoesq: 37.5, coxadir: 62, coxaesq: 61.5, glicemia: 92, insulina: 8.5, hdl: 48, ldl: 110, triglicerideos: 115, testosterona: 540, vitaminad: 42, mounjaro: 5, treino: "Sim", calorias: 1850 }
+/* Primeira pesagem real (Zepp Life, 30/09/2026 08:37) */
+const initialData = {
+  "2026-09-30": { peso: 113.0, gordura: 38.2, musculo: 66.19, visceral: 17, agua: 44.0, proteina: 14.5, massaossea: 3.55, tmb: 2041, imc: 36.9, idadecorporal: 69, pontuacao: 45 }
 };
+
+/* Faixas de referência exibidas pela balança */
+const BIO = [
+  { key:'imc', name:'IMC', unit:'', dec:1, edges:[10,18.5,25,30,40], labels:['Baixo','Normal','Elevado','Alto'], colors:['#3b82f6','#4ade80','#f59e4b','#f87171'], lowerIsBetter:true },
+  { key:'gordura', name:'Gordura corporal', unit:'%', dec:1, edges:[5,12,18,23,28,50], labels:['Muito baixo','Baixo','Normal','Elevado','Alto'], colors:['#1d4ed8','#3b82f6','#4ade80','#f59e4b','#f87171'], lowerIsBetter:true },
+  { key:'visceral', name:'Gordura visceral', unit:'', dec:0, edges:[1,10,15,30], labels:['Normal','Elevado','Alto'], colors:['#4ade80','#f59e4b','#f87171'], lowerIsBetter:true },
+  { key:'agua', name:'Água', unit:'%', dec:1, edges:[30,55,65.1,75], labels:['Insuficiente','Normal','Ótimo'], colors:['#f87171','#4ade80','#3b82f6'] },
+  { key:'proteina', name:'Proteína', unit:'%', dec:1, edges:[10,16,18,22], labels:['Insuficiente','Normal','Ótimo'], colors:['#f87171','#4ade80','#3b82f6'] },
+  { key:'tmb', name:'Metabolismo basal', unit:' kcal', dec:0, edges:[1500,TMB_ALVO,3200], labels:['Abaixo da referência','Referência atingida'], colors:['#f87171','#4ade80'] }
+];
 
 const measureColors = {
   'Abdômen (cm)':'#38bdf8','Cintura (cm)':'#3b82f6','Peitoral (cm)':'#a78bfa',
@@ -640,6 +723,7 @@ let currentSelectedMetric = null;
 let barMode = 'peso';
 
 /* ===== Helpers ===== */
+const $ = id => document.getElementById(id);
 const pad = n => String(n).padStart(2,'0');
 const toISO = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const todayISO = () => toISO(new Date());
@@ -648,17 +732,19 @@ const dm = iso => { const [, m, d] = iso.split('-'); return `${d}/${m}`; };
 const sortedDates = () => Object.keys(appData).sort();
 const daysBetween = (a, b) => Math.round((new Date(b + 'T12:00') - new Date(a + 'T12:00')) / 86400000);
 const has = v => v !== undefined && v !== null && v !== '';
+const signed = (n, d = 1) => `${n > 0 ? '+' : n < 0 ? '−' : ''}${fmt(Math.abs(n), d)}`;
 function series(key){
   return sortedDates().filter(d => has(appData[d][key]))
     .map(d => ({ date: d, v: parseFloat(appData[d][key]) })).filter(p => !isNaN(p.v));
 }
+const lastOf = key => series(key).at(-1) || null;
 function homa(o){ return (o && has(o.glicemia) && has(o.insulina)) ? +((parseFloat(o.glicemia) * parseFloat(o.insulina)) / 405).toFixed(2) : null; }
 
 function scalePts(vals, w, h, px, py){
-  const min = Math.min(...vals), max = Math.max(...vals), r = (max - min) || 1;
+  const min = Math.min(...vals), max = Math.max(...vals), r = max - min;
   return vals.map((v, i) => [
     vals.length === 1 ? w / 2 : px + i * (w - 2 * px) / (vals.length - 1),
-    py + (h - 2 * py) * (1 - (v - min) / r)
+    r === 0 ? h / 2 : py + (h - 2 * py) * (1 - (v - min) / r)
   ]);
 }
 function smoothPath(p){
@@ -672,20 +758,23 @@ function smoothPath(p){
   }
   return d;
 }
-/* Linha brilhante estilo "neon" */
+/* Linha brilhante estilo neon; com 1 ponto desenha a linha de partida */
 function glowLine(vals, { id, w = 420, h = 120, px = 24, py = 22, dots = true, c1 = '#1d4ed8', c2 = '#38bdf8' }){
-  if (vals.length < 2) return `<svg viewBox="0 0 ${w} ${h}"></svg>`;
-  const pts = scalePts(vals, w, h, px, py);
+  if (!vals.length) return '';
+  const single = vals.length === 1;
+  const v = single ? [vals[0], vals[0]] : vals;
+  const pts = scalePts(v, w, h, px, py);
   const line = smoothPath(pts);
   const area = `${line} L${pts.at(-1)[0]},${h} L${pts[0][0]},${h} Z`;
-  const dotsSvg = dots ? pts.map((p, i) => `<circle cx="${p[0]}" cy="${p[1]}" r="${i === pts.length - 1 ? 4 : 2.8}" fill="#bfdbfe" filter="url(#${id}-g)"/>`).join('') : '';
+  const dotPts = !dots ? [] : single ? [pts.at(-1)] : pts;
+  const dotsSvg = dotPts.map((p, i) => `<circle cx="${p[0]}" cy="${p[1]}" r="${i === dotPts.length - 1 ? 4 : 2.8}" fill="#bfdbfe" filter="url(#${id}-g)"/>`).join('');
   return `<svg viewBox="0 0 ${w} ${h}" aria-hidden="true">
     <defs>
-      <linearGradient id="${id}-s" x1="0" x2="1"><stop offset="0" stop-color="${c1}" stop-opacity=".15"/><stop offset=".45" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient>
+      <linearGradient id="${id}-s" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="${w}" y2="0"><stop offset="0" stop-color="${c1}" stop-opacity=".15"/><stop offset=".45" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient>
       <linearGradient id="${id}-a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c2}" stop-opacity=".18"/><stop offset="1" stop-color="${c2}" stop-opacity="0"/></linearGradient>
-      <filter id="${id}-g" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      <filter id="${id}-g" filterUnits="userSpaceOnUse" x="0" y="0" width="${w}" height="${h}"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
     </defs>
-    <path d="${area}" fill="url(#${id}-a)"/>
+    ${single ? '' : `<path d="${area}" fill="url(#${id}-a)"/>`}
     <path d="${line}" fill="none" stroke="url(#${id}-s)" stroke-width="2.5" stroke-linecap="round" filter="url(#${id}-g)"/>
     ${dotsSvg}
   </svg>`;
@@ -700,14 +789,13 @@ function ring(pct, id, c1, c2, sw = 11){
       stroke-dasharray="${c}" stroke-dashoffset="${off}" transform="rotate(-90 75 75)" style="filter:drop-shadow(0 0 6px ${c1});transition:stroke-dashoffset .8s"/>
   </svg>`;
 }
-const $ = id => document.getElementById(id);
 
 /* ===== Init ===== */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   $('heroName').textContent = USER_NAME;
   $('avatarName').textContent = USER_NAME;
   $('avatarInitial').textContent = USER_NAME.charAt(0).toUpperCase();
-  loadFromLocalStorage();
+  if (!(await loadCSVFromRepo())) loadFromLocalStorage();
   tickClock(); setInterval(tickClock, 30000);
   renderCalendar();
   updateOverview();
@@ -721,15 +809,16 @@ function tickClock(){
   const now = new Date(), h = now.getHours();
   $('clock').textContent = `${pad(h)}:${pad(now.getMinutes())}`;
   $('greet').textContent = h < 12 ? 'Bom dia,' : h < 18 ? 'Boa tarde,' : 'Boa noite,';
-  const dateStr = now.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+  $('dateMain').textContent = now.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
   const week = now.toLocaleDateString('pt-BR', { weekday: 'long' });
-  $('dateMain').textContent = dateStr;
   $('dateWeek').textContent = week.charAt(0).toUpperCase() + week.slice(1);
 }
 
 function updateOverview(){
   renderHero();
   renderComposition();
+  renderScore();
+  renderBio();
   renderDose();
   renderHabits();
   renderTrend();
@@ -743,37 +832,86 @@ function updateOverview(){
 /* ===== Cards ===== */
 function renderHero(){
   const w = series('peso');
-  if (w.length){
-    const start = w[0].v, last = w.at(-1).v, lost = start - last;
-    $('heroSub').textContent = lost > 0
-      ? `${fmt(lost)} kg a menos desde ${dm(w[0].date)}. Continue firme.`
-      : 'Siga registrando para acompanhar sua evolução.';
-    $('heroSpark').innerHTML = glowLine(w.map(p => start - p.v), { id: 'hero', h: 110 });
-    $('lastWeight').textContent = fmt(last);
-    $('lastWeightDate').textContent = `Último registro em ${dm(w.at(-1).date)}`;
-    $('startWeight').textContent = `${fmt(start)} kg`;
-    $('minWeight').textContent = `${fmt(Math.min(...w.map(p => p.v)))} kg`;
-  } else {
+  if (!w.length){
     $('heroSub').textContent = 'Registre seu primeiro peso para começar.';
     $('heroSpark').innerHTML = '';
     ['lastWeight','startWeight','minWeight'].forEach(id => $(id).textContent = '--');
+    return;
   }
+  const start = w[0].v, last = w.at(-1).v, diff = last - start;
+  if (w.length === 1) $('heroSub').textContent = `Ponto de partida registrado em ${dm(w[0].date)}. Agora é acompanhar.`;
+  else if (diff < 0) $('heroSub').textContent = `${fmt(-diff)} kg a menos desde ${dm(w[0].date)}. Continue firme.`;
+  else $('heroSub').textContent = `${fmt(diff)} kg acima do início (${dm(w[0].date)}). Bora retomar o ritmo.`;
+  $('heroSpark').innerHTML = glowLine(w.map(p => start - p.v), { id: 'hero', h: 110 });
+  $('lastWeight').textContent = fmt(last);
+  $('lastWeightDate').textContent = `Último registro em ${dm(w.at(-1).date)}`;
+  $('startWeight').textContent = `${fmt(start)} kg`;
+  $('minWeight').textContent = `${fmt(Math.min(...w.map(p => p.v)))} kg`;
 }
 
 function renderComposition(){
-  const f = series('gordura'), w = series('peso');
-  $('statCount').textContent = sortedDates().length;
-  $('statLost').textContent = w.length > 1 ? `${fmt(Math.max(0, w[0].v - w.at(-1).v))} kg` : '--';
-  if (!f.length){ $('fatNow').textContent = '--'; $('compRing').innerHTML = ring(0,'rc','#60a5fa','#8b5cf6'); $('compDate').textContent = '--'; return; }
+  const f = series('gordura'), mu = lastOf('musculo'), bo = lastOf('massaossea');
+  $('statCount').textContent = sortedDates().filter(d => SCALE_KEYS.some(k => has(appData[d][k]))).length;
+  $('statMuscle').textContent = mu ? `${fmt(mu.v, 2)} kg` : '--';
+  $('statBone').textContent = bo ? `${fmt(bo.v, 2)} kg` : '--';
+  if (!f.length){ $('fatNow').textContent = '--'; $('compRing').innerHTML = ring(0,'rc','#38bdf8','#8b5cf6'); $('compDate').textContent = '--'; return; }
   const last = f.at(-1).v, diff = last - f[0].v;
   $('fatNow').textContent = fmt(last);
   $('compDate').textContent = dm(f.at(-1).date);
-  $('fatNote').textContent = f.length > 1
-    ? `Gordura corporal, ${diff <= 0 ? '−' : '+'}${fmt(Math.abs(diff))} pts desde o início`
-    : 'Gordura corporal';
+  $('fatNote').textContent = f.length > 1 ? `Gordura corporal, ${signed(diff)} pts desde o início` : 'Gordura corporal';
   const lean = 100 - last;
   $('compRing').innerHTML = ring(lean / 100, 'rc', '#38bdf8', '#8b5cf6') +
     `<div class="ring-center"><b>${fmt(lean)}%</b><span>massa magra</span></div>`;
+}
+
+function renderScore(){
+  const s = series('pontuacao'), age = lastOf('idadecorporal'), w = lastOf('peso');
+  if (s.length){
+    const last = s.at(-1).v, prev = s.length > 1 ? s.at(-2).v : null;
+    const sub = prev !== null ? `${signed(last - prev, 0)} desde ${dm(s.at(-2).date)}` : 'de 100';
+    $('scoreRing').innerHTML = ring(last / 100, 'rs', '#38bdf8', '#3b82f6') + `<div class="ring-center"><b>${fmt(last, 0)}</b><span>${sub}</span></div>`;
+  } else {
+    $('scoreRing').innerHTML = ring(0, 'rs', '#38bdf8', '#3b82f6') + `<div class="ring-center"><b>--</b><span>de 100</span></div>`;
+  }
+  $('bodyAge').textContent = age ? `${fmt(age.v, 0)} anos` : '--';
+  $('idealWeight').textContent = `${fmt(PESO_IDEAL)} kg`;
+  $('toIdeal').textContent = w ? `${fmt(Math.max(0, w.v - PESO_IDEAL))} kg` : '--';
+}
+
+function bioPos(b, v){
+  const e = b.edges, n = e.length - 1;
+  if (v <= e[0]) return { pos: 0, seg: 0 };
+  if (v >= e[n]) return { pos: 1, seg: n - 1 };
+  let i = 0; while (i < n - 1 && v >= e[i + 1]) i++;
+  return { pos: (i + (v - e[i]) / (e[i + 1] - e[i])) / n, seg: i };
+}
+function renderBio(){
+  const last = sortedDates().filter(d => BIO.some(b => has(appData[d][b.key]))).at(-1);
+  $('bioDate').textContent = last ? dm(last) : '--';
+  $('bioList').innerHTML = BIO.map(b => {
+    const s = series(b.key), cur = s.at(-1), prev = s.length > 1 ? s.at(-2) : null;
+    const n = b.edges.length - 1;
+    const segs = b.colors.map(c => `<span style="background:${c}"></span>`).join('');
+    const ticks = b.edges.slice(1, -1).map((t, i) => `<span style="left:${(i + 1) / n * 100}%">${fmt(t)}</span>`).join('');
+    if (!cur) return `<div class="bio-item"><div class="bi-head"><span class="bi-name">${b.name}</span></div>
+      <div class="bi-val">--</div><div class="range"><div class="range-bar">${segs}</div></div><div class="ticks">${ticks}</div><div class="bi-delta"></div></div>`;
+    const { pos, seg } = bioPos(b, cur.v);
+    let delta = '';
+    if (prev){
+      const d = cur.v - prev.v;
+      if (d !== 0){
+        const good = b.lowerIsBetter ? d < 0 : d > 0;
+        delta = `<span class="${good ? 'good' : 'bad'}">${signed(d, b.dec)}${b.unit.trim() === '%' ? ' pts' : ''}</span> desde ${dm(prev.date)}`;
+      } else delta = `Sem alteração desde ${dm(prev.date)}`;
+    }
+    return `<div class="bio-item">
+      <div class="bi-head"><span class="bi-name">${b.name}</span><span class="bi-status" style="color:${b.colors[seg]}">${b.labels[seg]}</span></div>
+      <div class="bi-val">${fmt(cur.v, b.dec)}<small>${b.unit.trim()}</small></div>
+      <div class="range"><div class="range-bar">${segs}</div><span class="marker" style="left:${pos * 100}%"></span></div>
+      <div class="ticks">${ticks}</div>
+      <div class="bi-delta">${delta}</div>
+    </div>`;
+  }).join('');
 }
 
 function renderDose(){
@@ -821,16 +959,15 @@ function renderTrend(){
     $('trendStatus').textContent = diff < 0 ? 'Gordura em queda' : diff > 0 ? 'Gordura em alta' : 'Gordura estável';
     $('trendWave').innerHTML = glowLine(f.map(p => p.v), { id: 'wave', w: 420, h: 100, px: 0, py: 24, dots: false, c1: '#1e40af', c2: '#60a5fa' });
   } else {
-    $('trendStatus').textContent = 'Dados insuficientes';
-    $('trendWave').innerHTML = '<div style="height:90px"></div>';
+    $('trendStatus').textContent = 'Aguardando a próxima pesagem';
+    $('trendWave').innerHTML = f.length ? glowLine([f[0].v], { id: 'wave', w: 420, h: 100, px: 0, py: 24, dots: false, c1: '#1e40af', c2: '#60a5fa' }) : '<div style="height:90px"></div>';
   }
   const rateEl = $('trendRate');
-  if (w.length > 1){
-    const days = daysBetween(w[0].date, w.at(-1).date) || 1;
-    const rate = (w.at(-1).v - w[0].v) / days * 7;
-    rateEl.textContent = `${rate < 0 ? '−' : '+'}${fmt(Math.abs(rate))} kg`;
+  if (w.length > 1 && daysBetween(w[0].date, w.at(-1).date) > 0){
+    const rate = (w.at(-1).v - w[0].v) / daysBetween(w[0].date, w.at(-1).date) * 7;
+    rateEl.textContent = `${signed(rate)} kg`;
     rateEl.style.color = rate < 0 ? 'var(--green)' : 'var(--orange)';
-  } else { rateEl.textContent = '--'; rateEl.style.color = ''; }
+  } else { rateEl.textContent = 'Precisa de 2 pesagens'; rateEl.style.color = 'var(--muted)'; }
 }
 
 function setBarMode(mode){
@@ -840,15 +977,16 @@ function setBarMode(mode){
 }
 function renderBars(){
   const s = series(barMode).slice(-7);
-  const unit = barMode === 'peso' ? ' kg' : '%';
-  if (!s.length){ $('barsArea').innerHTML = `<div class="bars-empty">Nenhum registro de ${barMode} ainda.</div>`; return; }
-  const vals = s.map(p => p.v), min = Math.min(...vals), max = Math.max(...vals), r = (max - min) || 1;
+  const unit = barMode === 'gordura' ? '%' : ' kg';
+  const label = { peso: 'peso', gordura: 'gordura', musculo: 'músculo' }[barMode];
+  if (!s.length){ $('barsArea').innerHTML = `<div class="bars-empty">Nenhum registro de ${label} ainda.</div>`; return; }
+  const vals = s.map(p => p.v), min = Math.min(...vals), max = Math.max(...vals), r = max - min;
   $('barsArea').innerHTML = `<div class="bars">${s.map((p, i) => {
-    const h = 28 + 72 * (p.v - min) / r;
+    const h = r === 0 ? 70 : 28 + 72 * (p.v - min) / r;
     const last = i === s.length - 1;
     return `<div class="bar-col${last ? ' last' : ''}">
       <div class="bar-track"><div class="bar-fill" style="height:${h}%"></div>
-        <span class="bar-tip" style="top:${100 - h}%">${fmt(p.v)}${unit}</span></div>
+        <span class="bar-tip" style="top:${100 - h}%">${fmt(p.v, 2)}${unit}</span></div>
       <span class="bar-lbl">${dm(p.date)}</span>
     </div>`;
   }).join('')}</div>`;
@@ -861,10 +999,10 @@ function renderRecent(){
     const d = appData[date];
     const [, m, day] = date.split('-');
     const cats = [];
-    if (has(d.peso) || has(d.gordura) || has(d.massamagra) || has(d.visceral)) cats.push('Balança');
-    if (['abdomen','cintura','peitoral','bracodir','bracoesq','coxadir','coxaesq'].some(k => has(d[k]))) cats.push('Medidas');
+    if (SCALE_KEYS.some(k => has(d[k]))) cats.push('Balança');
+    if (MEASURE_KEYS.some(k => has(d[k]))) cats.push('Medidas');
     if (has(d.mounjaro)) cats.push('Mounjaro');
-    const exam = ['glicemia','insulina','hdl','ldl','triglicerideos','testosterona','vitaminad'].some(k => has(d[k]));
+    const exam = EXAM_KEYS.some(k => has(d[k]));
     if (exam) cats.push('Exames');
     if (d.treino === 'Sim' || has(d.calorias) || has(d.passos) || has(d.sono)) cats.push('Hábitos');
     let title = 'Registro do dia';
@@ -894,9 +1032,10 @@ const examVal = (date, id) => id === 'homair' ? homa(appData[date]) : (has(appDa
 
 function renderExamSummary(){
   const ed = examDatesList();
+  $('examNote').classList.toggle('hidden', ed.length < 2);
   if (ed.length < 2){
     $('examRing').innerHTML = ring(0,'re','#60a5fa','#3b82f6',9) + `<div class="ring-center"><b>--</b><span>${ed.length ? '1 exame' : 'sem exames'}</span></div>`;
-    $('examMeters').innerHTML = '';
+    $('examMeters').innerHTML = `<p class="muted" style="font-size:12.5px;text-align:center">${ed.length ? 'Com o próximo exame aparece a comparação.' : 'Registre seus exames em Registro rápido.'}</p>`;
     return;
   }
   const last = ed.at(-1), prev = ed.at(-2), first = ed[0];
@@ -906,8 +1045,7 @@ function renderExamSummary(){
     if (a !== null && b !== null && a !== b){ total++; if (t.inverse ? b < a : b > a) improved++; }
   });
   const pct = total ? improved / total : 0;
-  $('examRing').innerHTML = ring(pct,'re','#60a5fa','#3b82f6',9) +
-    `<div class="ring-center"><b>${Math.round(pct * 100)}%</b><span>melhoraram</span></div>`;
+  $('examRing').innerHTML = ring(pct,'re','#60a5fa','#3b82f6',9) + `<div class="ring-center"><b>${Math.round(pct * 100)}%</b><span>melhoraram</span></div>`;
   $('examMeters').innerHTML = ['homair','vitaminad','hdl'].map(id => {
     const t = tests.find(x => x.id === id);
     const a = examVal(first, id), b = examVal(last, id);
@@ -916,7 +1054,7 @@ function renderExamSummary(){
     const color = good ? 'var(--blue-2)' : 'var(--red)';
     return `<div class="meter"><span>${t.name}</span>
       <div class="meter-track"><div class="meter-fill" style="width:${Math.min(100, Math.abs(ch))}%;background:${color};box-shadow:0 0 8px ${color}"></div></div>
-      <b>${ch > 0 ? '+' : '−'}${fmt(Math.abs(ch), 0)}%</b></div>`;
+      <b>${signed(ch, 0)}%</b></div>`;
   }).join('');
 }
 
@@ -925,7 +1063,9 @@ Chart.defaults.font.family = "'Inter', sans-serif";
 Chart.defaults.color = '#8b94a8';
 
 function renderMeasureChart(){
-  const dates = sortedDates();
+  const dates = sortedDates().filter(d => MEASURE_KEYS.some(k => has(appData[d][k])));
+  $('measureEmpty').classList.toggle('hidden', dates.length > 0);
+  $('measureChart').style.visibility = dates.length ? 'visible' : 'hidden';
   const labels = dates.map(dm);
   const ex = k => dates.map(d => has(appData[d][k]) ? parseFloat(appData[d][k]) : null);
   const map = [['Abdômen (cm)','abdomen'],['Cintura (cm)','cintura'],['Peitoral (cm)','peitoral'],['Braço Dir (cm)','bracodir'],['Braço Esq (cm)','bracoesq'],['Coxa Dir (cm)','coxadir'],['Coxa Esq (cm)','coxaesq']];
@@ -1042,7 +1182,7 @@ function renderCalendar(){
       if (has(d.mounjaro)) b += `<span class="badge b-mounjaro">${fmt(d.mounjaro)} mg</span>`;
       if (d.treino === 'Sim') b += `<span class="badge b-treino">Treino</span>`;
       if (has(d.peso)) b += `<span class="badge b-peso">${fmt(d.peso)} kg</span>`;
-      if (has(d.glicemia) || has(d.vitaminad)) b += `<span class="badge b-exame">Exames</span>`;
+      if (EXAM_KEYS.some(k => has(d[k]))) b += `<span class="badge b-exame">Exames</span>`;
       if (b) cell.innerHTML += `<div class="badges">${b}</div>`;
     }
     grid.appendChild(cell);
@@ -1100,7 +1240,29 @@ function loadFromLocalStorage(){
   let saved = null;
   try { saved = localStorage.getItem(STORAGE_KEY); } catch(e){}
   if (saved){ try { appData = JSON.parse(saved); return; } catch(e){} }
-  appData = JSON.parse(JSON.stringify(mockData)); saveToLocalStorage();
+  appData = JSON.parse(JSON.stringify(initialData)); saveToLocalStorage();
+}
+function parseCSVInto(text, target){
+  const lines = text.split(/\r\n|\n/); if (lines.length < 2) return;
+  const head = lines[0].split(',').map(h => h.trim().toLowerCase());
+  for (let i = 1; i < lines.length; i++){
+    if (!lines[i].trim()) continue;
+    const row = lines[i].split(','), rd = {}; let date = '';
+    row.forEach((v, idx) => { const h = head[idx]; if (h === 'data') date = v.trim(); else if (v.trim() !== '') rd[h] = v.trim(); });
+    if (date && Object.keys(rd).length) target[date] = { ...target[date], ...rd };
+  }
+}
+/* Se existir dados.csv ao lado do HTML, ele é a base; o que foi editado no navegador prevalece */
+async function loadCSVFromRepo(){
+  try {
+    const r = await fetch('dados.csv', { cache: 'no-store' });
+    if (!r.ok) return false;
+    const base = {}; parseCSVInto(await r.text(), base);
+    let local = {}; try { local = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e){}
+    appData = base;
+    Object.keys(local).forEach(d => appData[d] = { ...appData[d], ...local[d] });
+    return true;
+  } catch(e){ return false; }
 }
 function exportCSV(){
   let csv = ['Data'].concat(fields).join(',') + '\n';
@@ -1115,17 +1277,7 @@ function exportCSV(){
 function handleFileSelect(ev){
   const file = ev.target.files[0]; if (!file) return;
   const reader = new FileReader();
-  reader.onload = e => {
-    const lines = e.target.result.split(/\r\n|\n/); if (lines.length < 2) return;
-    const head = lines[0].split(',').map(h => h.trim().toLowerCase());
-    for (let i = 1; i < lines.length; i++){
-      if (!lines[i].trim()) continue;
-      const row = lines[i].split(','), rd = {}; let date = '';
-      row.forEach((v, idx) => { const h = head[idx]; if (h === 'data') date = v.trim(); else if (v.trim() !== '') rd[h] = v.trim(); });
-      if (date && Object.keys(rd).length) appData[date] = { ...appData[date], ...rd };
-    }
-    saveToLocalStorage(); renderCalendar(); updateOverview(); showToast('Base importada');
-  };
+  reader.onload = e => { parseCSVInto(e.target.result, appData); saveToLocalStorage(); renderCalendar(); updateOverview(); showToast('Base importada'); };
   reader.readAsText(file);
   ev.target.value = '';
 }
