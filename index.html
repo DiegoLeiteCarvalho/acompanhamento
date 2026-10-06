@@ -220,9 +220,10 @@ main{min-width:0;padding-bottom:40px}
 .view-head p{font-size:13px;color:var(--muted);margin-top:3px}
 .view-ic{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;background:rgba(59,130,246,.14);color:var(--blue-2);border:1px solid rgba(96,165,250,.3)}
 .view-ic svg{width:22px;height:22px}
-.bio-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.bio-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
 .bio{border:1px solid var(--line);border-radius:var(--r-md);padding:16px;background:rgba(148,163,184,.04);display:flex;flex-direction:column;align-items:center;text-align:center}
 .bio.hl-blue{border-color:rgba(96,165,250,.45);box-shadow:0 0 18px -6px rgba(59,130,246,.6)}
+.bio.hl-orange{border-color:rgba(245,158,75,.45);box-shadow:0 0 18px -6px rgba(245,158,75,.5)}
 .bio.hl-green{border-color:rgba(74,222,128,.4);box-shadow:0 0 18px -6px rgba(74,222,128,.5)}
 .bio-name{font-size:12px;color:var(--muted)}
 .bio-val{font-size:26px;font-weight:600;margin-top:6px}
@@ -269,9 +270,9 @@ main{min-width:0;padding-bottom:40px}
 .fgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
 .fgrid.three{grid-template-columns:repeat(3,1fr)}
 .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:500}
-.field input[type=number]{width:100%;padding:11px 12px;border-radius:11px;font-size:14px;color:var(--text);
+.field input[type=number],.field input[type=text]{width:100%;padding:11px 12px;border-radius:11px;font-size:14px;color:var(--text);
   background:rgba(148,163,184,.06);border:1px solid var(--line);outline:none;font-family:inherit}
-.field input[type=number]:focus{border-color:rgba(96,165,250,.6);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.field input[type=number]:focus,.field input[type=text]:focus{border-color:rgba(96,165,250,.6);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
 .field.full{grid-column:1/-1}
 .dose-field{display:flex;flex-direction:column;align-items:center;gap:10px;padding:24px;border-radius:16px;border:1px solid rgba(245,158,75,.3);background:rgba(245,158,75,.06)}
 .dose-field input{max-width:180px;text-align:center;font-size:18px!important;font-weight:600}
@@ -328,6 +329,19 @@ main{min-width:0;padding-bottom:40px}
   .score .ring-box{margin:0 auto}
 }
 
+/* Exames detalhados */
+.bio{align-items:stretch;text-align:left}
+.bio .bio-top{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
+.bio-st{font-size:11px;font-weight:600;white-space:nowrap}
+.bio-ref{font-size:11px;color:var(--dim);margin-top:2px}
+.bio .bio-val{font-size:24px}
+.bio-spark{margin:8px -6px 0}
+.bio-spark svg{display:block;width:100%;height:auto}
+.bio .trend{color:var(--muted);font-weight:500}
+.st-ok{color:var(--green)}.st-low,.st-high{color:var(--orange)}
+.ex-row{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:baseline;font-size:13px;padding:8px 0;border-top:1px solid var(--line)}
+.ex-row:first-child{border-top:0}
+.ex-row b{font-weight:600}
 /* ---------- Mobile ---------- */
 .mnav{display:none}
 @media (max-width:980px){
@@ -644,18 +658,29 @@ main{min-width:0;padding-bottom:40px}
         <div id="tabMounjaro" class="tab-content">
           <div class="dose-field field">
             <label for="inpMounjaro" style="color:var(--text);font-size:14px">Dose aplicada (mg)</label>
-            <input type="number" step="0.5" id="inpMounjaro" placeholder="Ex: 5">
+            <input type="number" step="0.5" id="inpMounjaro" placeholder="Ex: 2,5">
           </div>
         </div>
         <div id="tabExames" class="tab-content">
-          <div class="fgrid">
-            <div class="field"><label for="inpGlicemia">Glicemia (mg/dL)</label><input type="number" step="1" id="inpGlicemia"></div>
-            <div class="field"><label for="inpInsulina">Insulina (µU/mL)</label><input type="number" step="0.1" id="inpInsulina" placeholder="Para HOMA-IR"></div>
-            <div class="field"><label for="inpTestosterona">Testosterona (ng/dL)</label><input type="number" step="1" id="inpTestosterona"></div>
-            <div class="field"><label for="inpVitaminaD">Vitamina D (ng/mL)</label><input type="number" step="0.1" id="inpVitaminaD"></div>
-            <div class="field"><label for="inpHdl">HDL (mg/dL)</label><input type="number" step="1" id="inpHdl"></div>
-            <div class="field"><label for="inpLdl">LDL (mg/dL)</label><input type="number" step="1" id="inpLdl"></div>
-            <div class="field"><label for="inpTriglicerideos">Triglicerídeos (mg/dL)</label><input type="number" step="1" id="inpTriglicerideos"></div>
+          <p class="muted" style="font-size:12px;margin-bottom:14px">Aceita vírgula e valores como &lt; 0,05.</p>
+          <div class="fgrid three">
+            <div class="field"><label for="inpTestosterona">Testosterona total (ng/dL)</label><input type="text" inputmode="decimal" id="inpTestosterona"></div>
+            <div class="field"><label for="inpTestoLivre">Testosterona livre (pg/mL)</label><input type="text" inputmode="decimal" id="inpTestoLivre"></div>
+            <div class="field"><label for="inpEstradiol">Estradiol (pg/mL)</label><input type="text" inputmode="decimal" id="inpEstradiol"></div>
+            <div class="field"><label for="inpLh">LH (mIU/mL)</label><input type="text" inputmode="decimal" id="inpLh"></div>
+            <div class="field"><label for="inpFsh">FSH (mIU/mL)</label><input type="text" inputmode="decimal" id="inpFsh"></div>
+            <div class="field"><label for="inpProlactina">Prolactina (ng/mL)</label><input type="text" inputmode="decimal" id="inpProlactina"></div>
+            <div class="field"><label for="inpProgesterona">Progesterona (ng/mL)</label><input type="text" inputmode="decimal" id="inpProgesterona"></div>
+            <div class="field"><label for="inpVitaminaD">Vitamina D (ng/mL)</label><input type="text" inputmode="decimal" id="inpVitaminaD"></div>
+            <div class="field"><label for="inpB12">Vitamina B12 (pg/mL)</label><input type="text" inputmode="decimal" id="inpB12"></div>
+            <div class="field"><label for="inpAcidoUrico">Ácido úrico (mg/dL)</label><input type="text" inputmode="decimal" id="inpAcidoUrico"></div>
+            <div class="field"><label for="inpPsaTotal">PSA total (ng/mL)</label><input type="text" inputmode="decimal" id="inpPsaTotal"></div>
+            <div class="field"><label for="inpPsaLivre">PSA livre (ng/mL)</label><input type="text" inputmode="decimal" id="inpPsaLivre"></div>
+            <div class="field"><label for="inpGlicemia">Glicemia (mg/dL)</label><input type="text" inputmode="decimal" id="inpGlicemia"></div>
+            <div class="field"><label for="inpInsulina">Insulina (µU/mL)</label><input type="text" inputmode="decimal" id="inpInsulina"></div>
+            <div class="field"><label for="inpHdl">HDL (mg/dL)</label><input type="text" inputmode="decimal" id="inpHdl"></div>
+            <div class="field"><label for="inpLdl">LDL (mg/dL)</label><input type="text" inputmode="decimal" id="inpLdl"></div>
+            <div class="field"><label for="inpTriglicerideos">Triglicerídeos (mg/dL)</label><input type="text" inputmode="decimal" id="inpTriglicerideos"></div>
           </div>
         </div>
         <div id="tabHabitos" class="tab-content">
@@ -690,15 +715,26 @@ const fields = [
   'Peso','Gordura','Musculo','Visceral','Agua','Proteina','MassaOssea','Tmb','Imc','IdadeCorporal','Pontuacao',
   'Abdomen','Cintura','Peitoral','BracoDir','BracoEsq','CoxaDir','CoxaEsq',
   'Mounjaro','Treino','Calorias','Passos','Sono',
-  'Glicemia','Insulina','Testosterona','Hdl','Ldl','Triglicerideos','VitaminaD'
+  'Testosterona','TestoLivre','Estradiol','Lh','Fsh','Prolactina','Progesterona','VitaminaD','B12','AcidoUrico','PsaTotal','PsaLivre',
+  'Glicemia','Insulina','Hdl','Ldl','Triglicerideos'
 ];
 const SCALE_KEYS = ['peso','gordura','musculo','visceral','agua','proteina','massaossea','tmb','imc','idadecorporal','pontuacao'];
 const MEASURE_KEYS = ['abdomen','cintura','peitoral','bracodir','bracoesq','coxadir','coxaesq'];
-const EXAM_KEYS = ['glicemia','insulina','hdl','ldl','triglicerideos','testosterona','vitaminad'];
+const EXAM_KEYS = ['testosterona','testolivre','estradiol','lh','fsh','prolactina','progesterona','vitaminad','b12','acidourico','psatotal','psalivre','glicemia','insulina','hdl','ldl','triglicerideos'];
 
-/* Primeira pesagem real (Zepp Life, 30/09/2026 08:37) */
+/* Pesagem (Zepp Life), laudo Sabin de 03/10/2026 com histórico e dose de Mounjaro */
+const SEED_VERSION = 3;
 const initialData = {
-  "2026-09-30": { peso: 113.0, gordura: 38.2, musculo: 66.19, visceral: 17, agua: 44.0, proteina: 14.5, massaossea: 3.55, tmb: 2041, imc: 36.9, idadecorporal: 69, pontuacao: 45 }
+  "2010-12-11": { acidourico: 9.4 },
+  "2011-06-04": { acidourico: 8.8 },
+  "2013-07-15": { acidourico: 7.9 },
+  "2014-10-20": { acidourico: 8.4, b12: 395, vitaminad: 25.01, psalivre: 0.23 },
+  "2021-07-28": { acidourico: 8.9, lh: 4.61, fsh: 5.2, estradiol: 39.7, progesterona: 0.38, testosterona: 378.21, prolactina: 10.9, vitaminad: 13 },
+  "2023-04-15": { acidourico: 7.8, lh: 3.25, testosterona: 271.61, testolivre: 73.14, b12: 389, vitaminad: 17 },
+  "2024-08-13": { acidourico: 8.0, lh: 6.05, fsh: 6.0, estradiol: 18.8, progesterona: 0.32, testosterona: 365.33, testolivre: 96.34, prolactina: 8.8, b12: 383, vitaminad: 19, psatotal: 0.55 },
+  "2026-09-30": { peso: 113.0, gordura: 38.2, musculo: 66.19, visceral: 17, agua: 44.0, proteina: 14.5, massaossea: 3.55, tmb: 2041, imc: 36.9, idadecorporal: 69, pontuacao: 45 },
+  "2026-10-03": { acidourico: 6.5, lh: 5.2, fsh: 6.2, estradiol: 25.9, progesterona: "<0.05", testosterona: 324, testolivre: 80.92, prolactina: 8.9, b12: 543, vitaminad: 13, psatotal: 0.93, psalivre: 0.27, psarel: 28.3 },
+  "2026-10-04": { mounjaro: 2.5 }
 };
 
 /* Faixas de referência exibidas pela balança */
@@ -732,13 +768,16 @@ const dm = iso => { const [, m, d] = iso.split('-'); return `${d}/${m}`; };
 const sortedDates = () => Object.keys(appData).sort();
 const daysBetween = (a, b) => Math.round((new Date(b + 'T12:00') - new Date(a + 'T12:00')) / 86400000);
 const has = v => v !== undefined && v !== null && v !== '';
+const num = v => has(v) ? parseFloat(String(v).replace(',', '.').replace(/[<>\s]/g, '')) : NaN;
+const isLt = v => /^\s*</.test(String(v ?? ''));
+const dmy = iso => { const [y, m, d] = iso.split('-'); return `${d}/${m}/${y.slice(2)}`; };
 const signed = (n, d = 1) => `${n > 0 ? '+' : n < 0 ? '−' : ''}${fmt(Math.abs(n), d)}`;
 function series(key){
   return sortedDates().filter(d => has(appData[d][key]))
-    .map(d => ({ date: d, v: parseFloat(appData[d][key]) })).filter(p => !isNaN(p.v));
+    .map(d => ({ date: d, v: num(appData[d][key]) })).filter(p => !isNaN(p.v));
 }
 const lastOf = key => series(key).at(-1) || null;
-function homa(o){ return (o && has(o.glicemia) && has(o.insulina)) ? +((parseFloat(o.glicemia) * parseFloat(o.insulina)) / 405).toFixed(2) : null; }
+function homa(o){ return (o && has(o.glicemia) && has(o.insulina)) ? +((num(o.glicemia) * num(o.insulina)) / 405).toFixed(2) : null; }
 
 function scalePts(vals, w, h, px, py){
   const min = Math.min(...vals), max = Math.max(...vals), r = max - min;
@@ -915,20 +954,22 @@ function renderBio(){
 }
 
 function renderDose(){
-  const s = series('mounjaro');
-  if (!s.length){
+  const dates = sortedDates().filter(d => has(appData[d].mounjaro));
+  if (!dates.length){
     $('doseRing').innerHTML = ring(0,'rd','#fb923c','#f59e4b') + `<div class="ring-center"><b>--</b><span>sem registro</span></div>`;
     return;
   }
-  const last = s.at(-1), since = daysBetween(last.date, todayISO()), next = 7 - since;
+  const lastDate = dates.at(-1), dose = num(appData[lastDate].mounjaro);
+  const since = daysBetween(lastDate, todayISO()), next = 7 - since;
   let label;
   if (since === 0) label = 'aplicada hoje';
   else if (next > 1) label = `próxima em ${next} dias`;
   else if (next === 1) label = 'próxima amanhã';
   else if (next === 0) label = 'aplicar hoje';
   else label = `${-next} ${-next === 1 ? 'dia' : 'dias'} de atraso`;
+  const big = isNaN(dose) ? dm(lastDate) : `${fmt(dose)} mg`;
   $('doseRing').innerHTML = ring(Math.max(0, next) / 7, 'rd', '#fb923c', '#f59e4b') +
-    `<div class="ring-center"><b>${fmt(last.v)} mg</b><span>${label}</span></div>`;
+    `<div class="ring-center"><b>${big}</b><span>${label}</span></div>`;
 }
 
 function renderHabits(){
@@ -1007,7 +1048,8 @@ function renderRecent(){
     if (d.treino === 'Sim' || has(d.calorias) || has(d.passos) || has(d.sono)) cats.push('Hábitos');
     let title = 'Registro do dia';
     if (has(d.peso)) title = `${fmt(d.peso)} kg` + (has(d.gordura) ? `, ${fmt(d.gordura)}% de gordura` : '');
-    else if (has(d.mounjaro)) title = `Mounjaro ${fmt(d.mounjaro)} mg`;
+    else if (has(d.mounjaro)) title = isNaN(num(d.mounjaro)) ? 'Dose de Mounjaro aplicada' : `Mounjaro ${fmt(num(d.mounjaro))} mg`;
+    else if (exam) title = `Exames laboratoriais (${EXAM_KEYS.filter(k => has(d[k])).length} itens)`;
     const dot = exam ? 'green' : has(d.mounjaro) ? 'orange' : 'blue';
     return `<li class="event" tabindex="0" onclick="openModal('${date}')" onkeydown="if(event.key==='Enter')this.click()">
       <div class="ev-date"><b>${day}</b><span>${monthsShort[+m - 1]}</span></div>
@@ -1017,45 +1059,69 @@ function renderRecent(){
   }).join('');
 }
 
+/* Referências do laudo Sabin (homens, 20 a 49 anos) */
 const tests = [
-  { id: 'homair', name: 'HOMA-IR', unit: 'índice', inverse: true },
-  { id: 'glicemia', name: 'Glicemia', unit: 'mg/dL', inverse: true },
-  { id: 'insulina', name: 'Insulina', unit: 'µU/mL', inverse: true },
-  { id: 'testosterona', name: 'Testosterona', unit: 'ng/dL', inverse: false },
-  { id: 'vitaminad', name: 'Vitamina D', unit: 'ng/mL', inverse: false },
-  { id: 'hdl', name: 'HDL', unit: 'mg/dL', inverse: false },
-  { id: 'ldl', name: 'LDL', unit: 'mg/dL', inverse: true },
-  { id: 'triglicerideos', name: 'Triglicerídeos', unit: 'mg/dL', inverse: true }
+  { id: 'testosterona', name: 'Testosterona total', unit: 'ng/dL', lo: 249, hi: 836 },
+  { id: 'testolivre', name: 'Testosterona livre', unit: 'pg/mL', lo: 57.11, hi: 178.53 },
+  { id: 'estradiol', name: 'Estradiol', unit: 'pg/mL', lo: 11.3, hi: 43.2 },
+  { id: 'lh', name: 'LH', unit: 'mIU/mL', lo: 1.7, hi: 8.6 },
+  { id: 'fsh', name: 'FSH', unit: 'mIU/mL', lo: 1.5, hi: 12.4 },
+  { id: 'prolactina', name: 'Prolactina', unit: 'ng/mL', lo: 2.1, hi: 17.7 },
+  { id: 'progesterona', name: 'Progesterona', unit: 'ng/mL', lo: null, hi: 0.15 },
+  { id: 'vitaminad', name: 'Vitamina D', unit: 'ng/mL', lo: 20, hi: null, refText: 'Desejável acima de 20' },
+  { id: 'b12', name: 'Vitamina B12', unit: 'pg/mL', lo: 197, hi: 771 },
+  { id: 'acidourico', name: 'Ácido úrico', unit: 'mg/dL', lo: 3.4, hi: 7.0 },
+  { id: 'psatotal', name: 'PSA total', unit: 'ng/mL', lo: null, hi: 4.0 },
+  { id: 'psalivre', name: 'PSA livre', unit: 'ng/mL' },
+  { id: 'psarel', name: 'PSA livre/total', unit: '%', refText: 'Avaliada só com PSA total entre 4 e 10' },
+  { id: 'homair', name: 'HOMA-IR', unit: 'índice' },
+  { id: 'glicemia', name: 'Glicemia', unit: 'mg/dL' },
+  { id: 'insulina', name: 'Insulina', unit: 'µU/mL' },
+  { id: 'hdl', name: 'HDL', unit: 'mg/dL' },
+  { id: 'ldl', name: 'LDL', unit: 'mg/dL' },
+  { id: 'triglicerideos', name: 'Triglicerídeos', unit: 'mg/dL' }
 ];
-const examDatesList = () => sortedDates().filter(d => ['glicemia','hdl','testosterona','vitaminad'].some(k => has(appData[d][k])));
-const examVal = (date, id) => id === 'homair' ? homa(appData[date]) : (has(appData[date][id]) ? parseFloat(appData[date][id]) : null);
+function examVal(date, id){
+  const o = appData[date] || {};
+  if (id === 'homair') return homa(o);
+  if (id === 'psarel'){ if (has(o.psarel)) return num(o.psarel); const t = num(o.psatotal), l = num(o.psalivre); return (t > 0 && !isNaN(l)) ? +(l / t * 100).toFixed(1) : null; }
+  const v = num(o[id]); return isNaN(v) ? null : v;
+}
+const examSeries = id => sortedDates().map(d => ({ date: d, v: examVal(d, id) })).filter(p => p.v !== null);
+const examDatesList = () => sortedDates().filter(d => EXAM_KEYS.some(k => has(appData[d][k])));
+function refText(t){
+  if (t.refText) return t.refText;
+  if (t.lo != null && t.hi != null) return `Ref. ${fmt(t.lo, 2)} a ${fmt(t.hi, 2)}`;
+  if (t.hi != null) return `Ref. até ${fmt(t.hi, 2)}`;
+  if (t.lo != null) return `Ref. acima de ${fmt(t.lo, 2)}`;
+  return 'Sem referência no laudo';
+}
+function examStatus(t, v){
+  if (t.lo == null && t.hi == null) return null;
+  if (t.lo != null && v < t.lo) return { cls: 'st-low', txt: 'Abaixo' };
+  if (t.hi != null && v > t.hi) return { cls: 'st-high', txt: 'Acima' };
+  return { cls: 'st-ok', txt: 'Na faixa' };
+}
+const showVal = (date, t, v) => (t.id !== 'psarel' && isLt(appData[date][t.id]) ? '< ' : '') + fmt(v, 2);
 
 function renderExamSummary(){
   const ed = examDatesList();
-  $('examNote').classList.toggle('hidden', ed.length < 2);
-  if (ed.length < 2){
-    $('examRing').innerHTML = ring(0,'re','#60a5fa','#3b82f6',9) + `<div class="ring-center"><b>--</b><span>${ed.length ? '1 exame' : 'sem exames'}</span></div>`;
-    $('examMeters').innerHTML = `<p class="muted" style="font-size:12.5px;text-align:center">${ed.length ? 'Com o próximo exame aparece a comparação.' : 'Registre seus exames em Registro rápido.'}</p>`;
+  if (!ed.length){
+    $('examRing').innerHTML = ring(0,'re','#60a5fa','#3b82f6',9) + `<div class="ring-center"><b>--</b><span>sem exames</span></div>`;
+    $('examMeters').innerHTML = `<p class="muted" style="font-size:12.5px;text-align:center">Registre seus exames em Registro rápido.</p>`;
+    $('examNote').textContent = '';
     return;
   }
-  const last = ed.at(-1), prev = ed.at(-2), first = ed[0];
-  let improved = 0, total = 0;
-  tests.forEach(t => {
-    const a = examVal(prev, t.id), b = examVal(last, t.id);
-    if (a !== null && b !== null && a !== b){ total++; if (t.inverse ? b < a : b > a) improved++; }
-  });
-  const pct = total ? improved / total : 0;
-  $('examRing').innerHTML = ring(pct,'re','#60a5fa','#3b82f6',9) + `<div class="ring-center"><b>${Math.round(pct * 100)}%</b><span>melhoraram</span></div>`;
-  $('examMeters').innerHTML = ['homair','vitaminad','hdl'].map(id => {
-    const t = tests.find(x => x.id === id);
-    const a = examVal(first, id), b = examVal(last, id);
-    if (a === null || b === null || !a) return '';
-    const ch = (b - a) / a * 100, good = t.inverse ? ch < 0 : ch > 0;
-    const color = good ? 'var(--blue-2)' : 'var(--red)';
-    return `<div class="meter"><span>${t.name}</span>
-      <div class="meter-track"><div class="meter-fill" style="width:${Math.min(100, Math.abs(ch))}%;background:${color};box-shadow:0 0 8px ${color}"></div></div>
-      <b>${signed(ch, 0)}%</b></div>`;
-  }).join('');
+  const last = ed.at(-1);
+  const rows = tests.map(t => { const v = examVal(last, t.id); return v === null ? null : { t, v, st: examStatus(t, v) }; }).filter(Boolean);
+  const withRef = rows.filter(r => r.st), ok = withRef.filter(r => r.st.cls === 'st-ok');
+  const pct = withRef.length ? ok.length / withRef.length : 0;
+  $('examRing').innerHTML = ring(pct,'re','#60a5fa','#3b82f6',9) +
+    `<div class="ring-center"><b>${ok.length}/${withRef.length}</b><span>na referência</span></div>`;
+  const out = withRef.filter(r => r.st.cls !== 'st-ok');
+  const pick = [...out, ...rows.filter(r => ['testosterona','acidourico','b12'].includes(r.t.id) && !out.includes(r))].slice(0, 3);
+  $('examMeters').innerHTML = `<div>${pick.map(r => `<div class="ex-row"><span>${r.t.name}</span><b>${showVal(last, r.t, r.v)} <small class="muted">${r.t.unit}</small></b>${r.st ? `<span class="bio-st ${r.st.cls}">${r.st.txt}</span>` : '<span></span>'}</div>`).join('')}</div>`;
+  $('examNote').textContent = `Laudo de ${dmy(last)}, referências para homens de 20 a 49 anos`;
 }
 
 /* ===== Medidas (Chart.js) + mapa ===== */
@@ -1132,23 +1198,31 @@ function renderBloodTests(){
     $('bloodTestDateLabel').textContent = 'Sem registros';
     return;
   }
-  const last = ed.at(-1), prev = ed.length > 1 ? ed.at(-2) : null;
+  const last = ed.at(-1);
   const [y, m, d] = last.split('-');
-  $('bloodTestDateLabel').textContent = `Último exame em ${d}/${m}/${y}`;
+  $('bloodTestDateLabel').textContent = `Último exame em ${d}/${m}/${y}. Histórico desde ${dmy(ed[0])}.`;
   const html = tests.map(t => {
-    const cur = examVal(last, t.id);
-    if (cur === null) return '';
-    const pv = prev ? examVal(prev, t.id) : null;
+    const s = examSeries(t.id);
+    if (!s.length) return '';
+    const cur = s.at(-1), prev = s.length > 1 ? s.at(-2) : null, st = examStatus(t, cur.v);
     let trend = '';
-    if (pv !== null && pv !== cur){
-      const diff = cur - pv, good = t.inverse ? diff < 0 : diff > 0;
+    if (prev && prev.v !== cur.v && !isLt(appData[cur.date][t.id]) && !isLt(appData[prev.date][t.id])){
+      const diff = cur.v - prev.v;
       const path = diff > 0 ? 'M5 10l7-7 7 7M12 3v18' : 'M19 14l-7 7-7-7M12 21V3';
-      trend = `<div class="trend ${good ? 'good' : 'bad'}"><svg fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="${path}"/></svg>${fmt(Math.abs(diff / pv * 100))}%</div>`;
-    }
-    const hl = t.id === 'homair' ? ' hl-blue' : t.id === 'vitaminad' ? ' hl-green' : '';
-    return `<div class="bio${hl}"><span class="bio-name">${t.name}</span><span class="bio-val">${fmt(cur, 2)}</span><span class="bio-unit">${t.unit}</span>${trend}</div>`;
+      trend = `<div class="trend"><svg fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="${path}"/></svg>${fmt(Math.abs(diff / prev.v * 100))}% vs ${dmy(prev.date)}</div>`;
+    } else if (prev && prev.v === cur.v) trend = `<div class="trend">Igual a ${dmy(prev.date)}</div>`;
+    else if (prev) trend = `<div class="trend">Antes: ${fmt(prev.v, 2)} em ${dmy(prev.date)}</div>`;
+    const spark = s.length > 1 ? `<div class="bio-spark">${glowLine(s.map(p => p.v), { id: 'sp-' + t.id, w: 200, h: 46, px: 6, py: 9 })}</div>` : '';
+    const hl = st ? (st.cls === 'st-ok' ? '' : ' hl-orange') : '';
+    return `<div class="bio${hl}">
+      <div class="bio-top"><span class="bio-name">${t.name}</span>${st ? `<span class="bio-st ${st.cls}">${st.txt}</span>` : ''}</div>
+      <span class="bio-val">${showVal(cur.date, t, cur.v)}</span>
+      <span class="bio-unit">${t.unit}${cur.date !== last ? `, em ${dmy(cur.date)}` : ''}</span>
+      <span class="bio-ref">${refText(t)}</span>
+      ${trend}${spark}
+    </div>`;
   }).join('');
-  c.innerHTML = html || `<div class="empty">Dados de exames incompletos nesta data.</div>`;
+  c.innerHTML = html || `<div class="empty">Dados de exames incompletos.</div>`;
 }
 
 /* ===== Navegação ===== */
@@ -1179,9 +1253,9 @@ function renderCalendar(){
     const d = appData[ds];
     if (d){
       let b = '';
-      if (has(d.mounjaro)) b += `<span class="badge b-mounjaro">${fmt(d.mounjaro)} mg</span>`;
+      if (has(d.mounjaro)) b += `<span class="badge b-mounjaro">${isNaN(num(d.mounjaro)) ? 'Mounjaro' : fmt(num(d.mounjaro)) + ' mg'}</span>`;
       if (d.treino === 'Sim') b += `<span class="badge b-treino">Treino</span>`;
-      if (has(d.peso)) b += `<span class="badge b-peso">${fmt(d.peso)} kg</span>`;
+      if (has(d.peso)) b += `<span class="badge b-peso">${fmt(num(d.peso))} kg</span>`;
       if (EXAM_KEYS.some(k => has(d[k]))) b += `<span class="badge b-exame">Exames</span>`;
       if (b) cell.innerHTML += `<div class="badges">${b}</div>`;
     }
@@ -1205,7 +1279,9 @@ function openModal(dateStr, tab = 'tabBalanca'){
     fields.forEach(f => {
       const el = $(`inp${f}`), key = f.toLowerCase();
       if (el && data[key] !== undefined){
-        if (el.type === 'checkbox') el.checked = data[key] === 'Sim'; else el.value = data[key];
+        if (el.type === 'checkbox') el.checked = data[key] === 'Sim';
+        else if (el.type === 'number') el.value = isNaN(num(data[key])) ? '' : num(data[key]);
+        else el.value = String(data[key]).replace('.', ',');
       }
     });
   }
@@ -1229,6 +1305,11 @@ function saveData(){
     const v = el.type === 'checkbox' ? (el.checked ? 'Sim' : '') : el.value;
     if (v !== '') { nd[f.toLowerCase()] = v; any = true; }
   });
+  const old = appData[ds] || {};
+  if (!has(nd.mounjaro) && has(old.mounjaro) && isNaN(num(old.mounjaro))){ nd.mounjaro = old.mounjaro; any = true; }
+  // mantém campos que não estão no formulário (ex: relação PSA do laudo)
+  const formKeys = fields.map(f => f.toLowerCase());
+  Object.keys(old).forEach(k => { if (!formKeys.includes(k) && any) nd[k] = old[k]; });
   if (any) appData[ds] = nd; else delete appData[ds];
   saveToLocalStorage(); renderCalendar(); updateOverview(); closeModal();
   showToast('Registro salvo');
@@ -1237,10 +1318,18 @@ function saveData(){
 /* ===== Persistência / CSV ===== */
 function saveToLocalStorage(){ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); } catch(e){} }
 function loadFromLocalStorage(){
-  let saved = null;
-  try { saved = localStorage.getItem(STORAGE_KEY); } catch(e){}
-  if (saved){ try { appData = JSON.parse(saved); return; } catch(e){} }
-  appData = JSON.parse(JSON.stringify(initialData)); saveToLocalStorage();
+  let saved = null, seedV = 0;
+  try { saved = localStorage.getItem(STORAGE_KEY); seedV = +(localStorage.getItem(STORAGE_KEY + ':seed') || 0); } catch(e){}
+  try { appData = saved ? JSON.parse(saved) : {}; } catch(e){ appData = {}; }
+  if (seedV < SEED_VERSION){
+    // Inclui dados novos da base sem sobrescrever o que já foi editado no navegador
+    Object.entries(initialData).forEach(([d, rec]) => appData[d] = { ...rec, ...(appData[d] || {}) });
+    // v3: dose de 04/10 registrada antes sem valor
+    const r = appData['2026-10-04'];
+    if (r && isNaN(num(r.mounjaro))) r.mounjaro = 2.5;
+    try { localStorage.setItem(STORAGE_KEY + ':seed', SEED_VERSION); } catch(e){}
+    saveToLocalStorage();
+  }
 }
 function parseCSVInto(text, target){
   const lines = text.split(/\r\n|\n/); if (lines.length < 2) return;
